@@ -1,39 +1,59 @@
-# History files
-.Rhistory
-.Rapp.history
+---
+title: "R Notebook"
+output: html_notebook
+---
 
-# Session Data files
-.RData
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
-# User-specific files
-.Ruserdata
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
-# Example code in package build process
-*-Ex.R
+```{r}
+#cargamos libreria
 
-# Output files from R CMD build
-/*.tar.gz
+library(caret)
 
-# Output files from R CMD check
-/*.Rcheck/
+#cargamos data set
 
-# RStudio files
-.Rproj.user/
+auto <-  read.csv("../Desktop/sebastian/r studio/cheat sheet/auto-mpg.csv.txt")
 
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
+# cambiamos la variable cylinders a factor
+auto$cylinders <- factor(auto$cylinders,
+                         levels = c(3,4,5,6,8),
+                         labels = c("3c" , "4c" ,"5c","6c","8c" ))
 
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
+# plantamos la semilla 
 
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
+set.seed(2018)
 
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
+#creamos el t.id 
 
-# R Environment Variables
-.Renviron
+t.id <- createDataPartition(auto$cylinders, p=0.7 , list = FALSE, )
+
+names(auto)
+
+# creammos el modelo lineal con los datos
+
+mod <- lm(mpg ~ ., data = auto[t.id,-c(1,8,9)] )
+
+
+mod
+
+#resumen del modelo
+
+summary(mod)
+
+
+# plot los residuos
+
+boxplot(mod$residuals)
+
+
+library(MASS)
+
+# buscamos un modelo que defina las variables significativas 
+
+step.model <- stepAIC(mod, direction = "backward")
+
+summary(step.model)
+
+step.model$anova
